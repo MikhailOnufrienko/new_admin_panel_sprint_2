@@ -1,27 +1,27 @@
-FROM python:3.10
+FROM python:3.9.6-alpine
 
-WORKDIR /opt/app
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir -p $APP_HOME
+RUN mkdir -p $APP_HOME/staticfiles
+WORKDIR $APP_HOME
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV UWSGI_PROCESSES 1
-ENV UWSGI_THREADS 16
-ENV UWSGI_HARAKIRI 240
-ENV DJANGO_SETTINGS_MODULE 'example.settings'
 
-COPY run_uwsgi.sh run_uwsgi.sh
-COPY requirements.txt requirements.txt
-COPY uwsgi/uwsgi.ini uwsgi.ini
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
 
-RUN  mkdir -p /var/www/static/ \
-     && mkdir -p /var/www/media/ \
-     && mkdir -p /opt/app/static/ \
-     && mkdir -p /opt/app/media/ \
-     && pip install --upgrade pip \
-     && pip install -r requirements.txt
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./entrypoint.sh .
+RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
+RUN chmod +x $APP_HOME/entrypoint.sh
 
 COPY . .
 
-EXPOSE 8000
+ENTRYPOINT ["/home/app/web/entrypoint.sh"]
 
-ENTRYPOINT ["uwsgi", "--strict", "--ini", "uwsgi.ini"]
+
