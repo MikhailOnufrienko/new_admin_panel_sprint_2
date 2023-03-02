@@ -15,13 +15,13 @@ RUN groupadd -r djus && useradd -d /app -r -g djus djus \
 
 RUN mkdir /app/static && mkdir /app/media
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY run_uwsgi.sh run_uwsgi.sh
-COPY uwsgi/uwsgi.ini uwsgi.ini
-
+COPY run_uwsgi.sh /app/
+COPY uwsgi/uwsgi.ini /app/
 COPY . .
 
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["uwsgi", "--strict", "--ini", "uwsgi.ini"]
+RUN chmod -R 775 /app/run_uwsgi.sh
+
+ENTRYPOINT ["/app/run_uwsgi.sh"]
 

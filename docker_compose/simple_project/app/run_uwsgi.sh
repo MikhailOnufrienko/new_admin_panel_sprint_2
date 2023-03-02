@@ -4,4 +4,6 @@ set -e
 
 chown djus:djus /var/log
 
-uwsgi --strict --ini /etc/app/uwsgi.ini
+python manage.py collectstatic --noinput
+python manage.py migrate
+uwsgi --strict --ini /app/uwsgi.ini
