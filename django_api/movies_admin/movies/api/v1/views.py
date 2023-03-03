@@ -5,7 +5,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Q
 from django.db.models.query import QuerySet
 
-from movies.models import Filmwork
+from movies.models import Filmwork, PersonFilmwork
 
 
 class MoviesApiMixin:
@@ -27,13 +27,13 @@ class MoviesApiMixin:
                 'genres__name', distinct=True
             ),
             actors=ArrayAgg(
-                'persons__full_name', filter=Q(persons__personfilmwork__role='actor'), distinct=True
+                'persons__full_name', filter=Q(persons__personfilmwork__role=PersonFilmwork.Roles.ACTOR), distinct=True
             ),
             directors=ArrayAgg(
-                'persons__full_name', filter=Q(persons__personfilmwork__role='director'), distinct=True
+                'persons__full_name', filter=Q(persons__personfilmwork__role=PersonFilmwork.Roles.DIRECTOR), distinct=True
             ),
             writers=ArrayAgg(
-                'persons__full_name', filter=Q(persons__personfilmwork__role='writer'), distinct=True
+                'persons__full_name', filter=Q(persons__personfilmwork__role=PersonFilmwork.Roles.WRITER), distinct=True
             ),
         )
         print(type(queryset))
