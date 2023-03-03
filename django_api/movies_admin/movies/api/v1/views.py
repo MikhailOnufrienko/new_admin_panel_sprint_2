@@ -1,20 +1,23 @@
 from django.http import JsonResponse
-from django.core.paginator import Paginator
 from django.views.generic.list import BaseListView
 from django.views.generic.detail import BaseDetailView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Q
-from django.db import connection
+from django.db.models.query import QuerySet
 
 from movies.models import Filmwork
 
 
 class MoviesApiMixin:
+
     model = Filmwork
     http_method_names = ['get']
     paginate_by = 50
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """Generate a queryset from the given filmwork objects.
+
+        """
         queryset = Filmwork.objects.prefetch_related(
             'genres', 'persons'
         ).values(
@@ -33,15 +36,22 @@ class MoviesApiMixin:
                 'persons__full_name', filter=Q(persons__personfilmwork__role='writer'), distinct=True
             ),
         )
+        print(type(queryset))
         return queryset
 
-    def render_to_response(self, context, **response_kwargs):
+    def render_to_response(self, context: dict, **response_kwargs) -> JsonResponse:
+        """Render the context into JSON format.
+
+        """
         return JsonResponse(context)
 
 
 class MoviesListApi(MoviesApiMixin, BaseListView):
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get filmwork list data needed for the response context.
+
+        """
         context = super().get_context_data(**kwargs)
         paginator = context['paginator']
         page = context['page_obj']
@@ -63,7 +73,10 @@ class MoviesListApi(MoviesApiMixin, BaseListView):
 
 class MoviesDetailApi(MoviesApiMixin, BaseDetailView):
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get single filmwork data needed for the response context.
+
+        """
         context = super().get_context_data(**kwargs)
         movie = context['object']
         data = {
