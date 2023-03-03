@@ -8,6 +8,10 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data/
     env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   web:
     build: ./app
