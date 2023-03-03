@@ -7,8 +7,7 @@ services:
     container_name: pg_cont
     volumes:
       - db_data:/var/lib/postgresql/data/
-    env_file:
-      - .env
+    env_file: .env
 
   web:
     build: ./app
@@ -18,8 +17,7 @@ services:
       - media_volume:/app/media
     ports:
       - "8000:8000"
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       - db
 
@@ -30,6 +28,7 @@ services:
       - ./configs:/etc/nginx/conf.d:ro
       - static_volume:/app/static
       - media_volume:/app/media
+    env_file: .env
     ports:
       - "${NGINX_EXTERNAL_PORT}:80"
     depends_on:

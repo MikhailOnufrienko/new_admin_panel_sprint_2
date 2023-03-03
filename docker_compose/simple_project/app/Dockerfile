@@ -8,6 +8,8 @@ ENV UWSGI_HARAKIRI 240
 
 WORKDIR /app
 
+RUN apt update && apt -y install netcat postgresql
+
 RUN pip install --upgrade pip
 
 RUN groupadd -r djus && useradd -d /app -r -g djus djus \
